@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="李厚泽｜B端产品经理作品集｜简历与可交互原型">
+  <title>李厚泽｜产品作品集</title>
+  <style>
+    :root{
+      --ink:#0b0d10;--paper:#f3f1ea;--acid:#d7ff3f;--cyan:#61e8ff;
+      --line:rgba(11,13,16,.16);--muted:#646862;--white:#fff;
+      --sans:"Microsoft YaHei","PingFang SC","Noto Sans SC",Arial,sans-serif;
+      --serif:"Songti SC","SimSun",serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--sans);background:var(--paper);color:var(--ink);overflow-x:hidden}
+    body.modal-open{overflow:hidden}
+    ::selection{background:var(--ink);color:var(--acid)}
+    a{color:inherit;text-decoration:none}
+    button,input{font:inherit}
+    .noise{pointer-events:none;position:fixed;inset:0;z-index:1;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+    .topbar{position:sticky;top:0;z-index:80;height:64px;padding:0 4vw;display:flex;align-items:center;justify-content:space-between;background:rgba(11,13,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .brand{display:flex;align-items:center;gap:12px;color:#fff}
+    .brand-name{font-size:18px;font-weight:800;letter-spacing:.02em}
+    .brand-line{width:28px;height:1px;background:rgba(255,255,255,.35)}
+    .brand-role{font-size:11px;letter-spacing:.12em;color:#9aa19a}
+    .topnav{display:flex;align-items:center;gap:22px;font-size:13px;color:#c9ccc6}
+    .topnav a{transition:.2s}.topnav a:hover,.topnav a.active{color:var(--acid)}
+    .nav-cta{padding:9px 15px;border:1px solid var(--acid);border-radius:99px;color:var(--acid)!important}
+    .menu{display:none;border:0;background:none;color:#fff;font-size:22px}
+    .hero{min-height:88vh;background:var(--ink);color:#fff;padding:96px 4vw 56px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+    .hero:before{content:"";position:absolute;right:-12%;top:-20%;width:55vw;height:55vw;border-radius:50%;background:radial-gradient(circle,rgba(215,255,63,.14),transparent 68%);pointer-events:none}
+    .hero:after{content:"";position:absolute;left:-10%;bottom:-30%;width:42vw;height:42vw;border-radius:50%;background:radial-gradient(circle,rgba(97,232,255,.1),transparent 70%);pointer-events:none}
+    .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8d958c;margin-bottom:18px}
+    .hero h1{font-size:clamp(48px,9vw,104px);line-height:.92;letter-spacing:-.06em;position:relative}
+    .hero h1 span{display:block;font-size:.34em;letter-spacing:.18em;color:var(--acid);margin-top:14px;font-weight:600}
+    .hero-lead{max-width:640px;font-size:clamp(16px,2vw,19px);line-height:1.75;color:#c9ccc6;margin:28px 0 28px;position:relative}
+    .tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px;position:relative}
+    .tag{border:1px solid rgba(255,255,255,.22);border-radius:99px;padding:8px 14px;font-size:12px;color:#d7dbd4}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;position:relative}
+    .btn{border:1px solid transparent;border-radius:99px;padding:13px 20px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:.25s;font-size:14px}
+    .btn-primary{background:var(--acid);color:var(--ink);font-weight:800}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(215,255,63,.22)}
+    .btn-ghost{border-color:rgba(255,255,255,.35);color:#fff;background:transparent}
+    .btn-ghost:hover{border-color:#fff}
+    .hero-contact{margin-top:40px;padding-top:22px;border-top:1px solid rgba(255,255,255,.14);display:flex;flex-wrap:wrap;gap:28px;position:relative}
+    .hero-contact small{display:block;font-size:10px;letter-spacing:.14em;color:#747b73;margin-bottom:6px}
+    .hero-contact a{font-size:15px}
+    .copy-btn{margin-left:8px;border:1px solid #424842;background:transparent;color:#8d958c;border-radius:99px;padding:3px 8px;font-size:10px;cursor:pointer}
+    .copy-btn:hover{border-color:var(--acid);color:var(--acid)}
+    .section{padding:88px 4vw}
+    .section-num{font:italic 15px var(--serif);color:var(--muted);margin-bottom:10px}
+    .section-title{font-size:clamp(32px,5vw,52px);letter-spacing:-.045em;line-height:1.1;margin-bottom:14px}
+    .section-title i{font-style:italic;color:#3d433f}
+    .section-desc{max-width:560px;color:var(--muted);line-height:1.75;font-size:15px;margin-bottom:36px}
+    .case{background:var(--ink);color:#fff}
+    .case .section-num{color:#8b9189}
+    .case .section-title i{color:var(--acid)}
+    .case .section-desc{color:#9aa19a}
+    .case-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:start}
+    .case-points{display:grid;gap:14px}
+    .case-point{border:1px solid rgba(255,255,255,.14);padding:18px 20px;border-radius:14px;background:rgba(255,255,255,.03)}
+    .case-point strong{display:block;font-size:15px;margin-bottom:6px}
+    .case-point span{font-size:13px;line-height:1.65;color:#a7aea6}
+    .case-aside{border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:24px;background:linear-gradient(160deg,rgba(215,255,63,.08),rgba(97,232,255,.05))}
+    .case-aside h3{font-size:20px;margin-bottom:12px}
+    .case-aside ul{list-style:none;display:grid;gap:10px;margin-bottom:20px}
+    .case-aside li{font-size:13px;line-height:1.6;color:#c9ccc6;padding-left:14px;position:relative}
+    .case-aside li:before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--acid)}
+    .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .proof-card{min-height:280px;border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;justify-content:space-between;transition:.25s;background:#fff}
+    .proof-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(11,13,16,.08)}
+    .proof-card.dark{background:var(--ink);color:#fff;border-color:transparent}
+    .proof-card.cyan{background:var(--cyan);border-color:transparent}
+    .proof-card .idx{font:italic 13px var(--serif);opacity:.55;margin-bottom:18px;display:block}
+    .proof-card h3{font-size:clamp(26px,3vw,36px);line-height:1.05;letter-spacing:-.04em;margin-bottom:12px}
+    .proof-card p{font-size:13px;line-height:1.7;opacity:.72;margin-bottom:20px}
+    .proof-card .chip{align-self:flex-start;border:1px solid currentColor;border-radius:99px;padding:6px 11px;font-size:11px;margin-bottom:16px}
+    .launch{border:1px solid currentColor;background:transparent;color:inherit;border-radius:99px;padding:10px 16px;font-size:12px;font-weight:800;cursor:pointer;align-self:flex-start}
+    .proof-card.dark .launch{border-color:var(--acid);color:var(--acid)}
+    .proof-grid.with-phone{grid-template-columns:1fr 1fr 1.15fr}
+    .proof-card.trip-phone{min-height:0;padding:22px;background:linear-gradient(165deg,#12151a,#0b0d10);color:#fff;border:0;display:grid;grid-template-columns:1fr;gap:16px;align-content:start}
+    .proof-card.trip-phone .trip-meta p{opacity:.78;color:#c9ccc6}
+    .proof-card.trip-phone .chip{border-color:rgba(255,255,255,.35)}
+    .phone-stage{display:flex;justify-content:center;padding:8px 0 4px}
+    .phone-frame{width:min(220px,100%);aspect-ratio:390/844;border-radius:28px;overflow:hidden;background:#0a0a0a;box-shadow:0 0 0 1px #3d424a,0 18px 40px rgba(0,0,0,.35);position:relative}
+    .phone-frame iframe{width:200%;height:200%;border:0;transform:scale(.5);transform-origin:top left;pointer-events:none}
+    .phone-frame .phone-hit{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:14px;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.55));cursor:pointer;border:0}
+    .phone-frame .phone-hit span{border:1px solid rgba(255,255,255,.4);background:rgba(11,13,16,.75);color:#fff;border-radius:99px;padding:8px 12px;font-size:11px;font-weight:700}
+    .viewer.phone-mode .viewer-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;background:radial-gradient(ellipse at 50% 20%,rgba(0,122,255,.12),transparent 55%),#0a0a0a;border-radius:12px}
+    .viewer.phone-mode .viewer-frame{width:min(390px,100%);height:min(844px,calc(100vh - 100px));aspect-ratio:390/844;flex:none;border-radius:12px;background:#0a0a0a}
+    .timeline{background:#e8e5dc}
+    .timeline-list{max-width:820px;border-left:1px solid var(--line);margin-left:8px}
+    .time-item{position:relative;padding:0 0 36px 28px}
+    .time-item:before{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:var(--ink);left:-6px;top:4px;box-shadow:0 0 0 6px #e8e5dc}
+    .time-item time{display:block;font:italic 14px var(--serif);margin-bottom:6px}
+    .time-item h3{font-size:18px;margin-bottom:6px}
+    .time-item p{color:var(--muted);font-size:14px;line-height:1.65}
+    .resume-panel{margin-top:40px;padding:28px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .resume-panel small{display:block;font-size:10px;letter-spacing:.14em;color:var(--muted);margin-bottom:8px}
+    .resume-panel h3{font-size:26px;letter-spacing:-.03em;margin-bottom:8px}
+    .resume-panel p{max-width:520px;font-size:14px;line-height:1.7;color:var(--muted)}
+    .resume-panel-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .resume-open,.resume-dl{border-radius:99px;padding:13px 20px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;transition:.25s;border:1px solid var(--ink)}
+    .resume-open{background:transparent;color:var(--ink)}
+    .resume-dl{background:var(--ink);color:var(--acid);display:inline-flex;align-items:center}
+    .resume-open:hover,.resume-dl:hover{transform:translateY(-2px)}
+    .contact{background:var(--ink);color:#fff;padding:100px 4vw 40px}
+    .contact .eyebrow{margin-bottom:28px}
+    .contact h2{font-size:clamp(42px,9vw,96px);line-height:.88;letter-spacing:-.06em}
+    .contact h2 span{color:var(--acid)}
+    .contact-row{margin-top:56px;padding-top:24px;border-top:1px solid rgba(255,255,255,.18);display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+    .contact-block small{display:block;color:#747b73;font-size:10px;letter-spacing:.13em;margin-bottom:8px}
+    .contact-block a,.contact-block span{font-size:15px}
+    .footer-note{margin-top:48px;color:#555d55;font-size:11px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .toast{position:fixed;right:22px;bottom:22px;z-index:400;background:var(--acid);color:var(--ink);padding:12px 16px;font-size:13px;font-weight:800;transform:translateY(80px);opacity:0;transition:.25s}
+    .toast.show{transform:none;opacity:1}
+    .viewer{position:fixed;inset:0;z-index:220;background:rgba(6,8,9,.96);display:none;flex-direction:column;padding:16px}
+    .viewer.show{display:flex!important}
+    .viewer-bar{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff;flex-wrap:wrap;margin-bottom:10px}
+    .viewer-bar strong{font-size:14px;flex:1;min-width:160px}
+    .viewer-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .viewer-action{border:1px solid rgba(255,255,255,.3);background:none;color:#fff;border-radius:99px;padding:8px 13px;font-size:11px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
+    .viewer-action:hover{border-color:var(--acid);color:var(--acid)}
+    .viewer-action.primary{border-color:var(--acid);background:var(--acid);color:var(--ink);font-weight:800}
+    .viewer-action.primary:hover{color:var(--ink)}
+    .viewer-status{font-size:11px;letter-spacing:.08em;color:#8d958c}
+    .viewer-close{width:36px;height:36px;border:1px solid rgba(255,255,255,.3);border-radius:50%;background:none;color:#fff;font-size:20px;cursor:pointer}
+    .viewer-frame{width:100%;flex:1;border:0;border-radius:12px;background:#fff}
+    .viewer-stage{flex:1;min-height:0;display:flex;flex-direction:column}
+    .viewer-fallback{display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#c9ccc6;text-align:center;padding:40px}
+    .viewer-fallback.show{display:flex}
+    .viewer-fallback p{max-width:420px;line-height:1.7;font-size:14px;opacity:.85}
+    @media(max-width:960px){
+      .menu{display:block}
+      .topnav{position:absolute;left:0;right:0;top:64px;background:rgba(11,13,16,.98);padding:16px 5vw 22px;border-bottom:1px solid rgba(255,255,255,.12);flex-direction:column;align-items:stretch;gap:0;display:none}
+      .topnav.open{display:flex}
+      .topnav a{padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+      .case-grid,.proof-grid,.proof-grid.with-phone,.contact-row{grid-template-columns:1fr}
+      .phone-frame{width:min(260px,78vw)}
+      .hero{min-height:auto;padding:88px 5vw 48px}
+      .section{padding:72px 5vw}
+      .hero-actions{flex-direction:column;align-items:stretch}
+      .hero-actions .btn{justify-content:center}
+    }
+    @media(max-width:560px){
+      .brand-line,.brand-role{display:none}
+      .hero h1{font-size:clamp(40px,12vw,56px)}
+      .contact-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="#top"><span class="brand-name">李厚泽</span><i class="brand-line"></i><span class="brand-role">PRODUCT PORTFOLIO</span></a>
+    <nav class="topnav" id="topnav">
+      <a href="#case">核心案例</a>
+      <a href="#demos">原型</a>
+      <a href="#resume" data-open-resume>简历</a>
+      <a class="nav-cta" href="#contact">联系我</a>
+    </nav>
+    <button class="menu" id="menuBtn" aria-label="打开菜单" aria-expanded="false">☰</button>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Product Manager · B-end · 2026</div>
+        <h1>李厚泽<span>PORTFOLIO</span></h1>
+        <p class="hero-lead">计算机背景的 B 端产品经理方向｜供应链采购（合同 / 订单）实习经历，能交付可交互原型。</p>
+        <div class="tags">
+          <span class="tag">供应链实习</span>
+          <span class="tag">合同 / 订单</span>
+          <span class="tag">可交互 Demo</span>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" type="button" data-open-resume>浏览简历</button>
+          <a class="btn btn-ghost" href="#demos">看原型 ↓</a>
+        </div>
+        <div class="hero-contact">
+          <div>
+            <small>EMAIL</small>
+            <a href="mailto:lihouze349@gmail.com">lihouze349@gmail.com</a>
+            <button class="copy-btn" type="button" data-copy="lihouze349@gmail.com">复制</button>
+          </div>
+          <div>
+            <small>PHONE</small>
+            <a href="tel:13109976038">131 0997 6038</a>
+            <button class="copy-btn" type="button" data-copy="13109976038">复制</button>
+          </div>
+          <div>
+            <small>TARGET</small>
+            <span>产品经理 / B 端产品</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case" id="case">
+      <div class="section-num">01 / CORE CASE</div>
+      <h2 class="section-title">采购合同与订单<br><i>一体化主案例</i></h2>
+      <p class="section-desc">工业互联网供应链场景：把「年度框架合同 + 分批采购订单」从线下分散，做成可校验、可协同、可追溯的线上闭环。</p>
+      <div class="case-grid">
+        <div class="case-points">
+          <div class="case-point"><strong>我做了什么</strong><span>梳理合同全生命周期与订单履约流程；设计状态机、权限与关键字段校验；输出高保真原型与 PRD，并跟进评审到验收。</span></div>
+          <div class="case-point"><strong>关键设计</strong><span>合同驱动下单（字段继承）、下单前校验（有效期 / 剩余量 / 价格 / 物料范围）、变更按履约阶段分流处理。</span></div>
+          <div class="case-point"><strong>结果表达</strong><span>合同拟定到关闭线上闭环；合同与订单数据打通；降低超合同采购与口径不一致风险。</span></div>
+        </div>
+        <aside class="case-aside">
+          <h3>30 秒看懂</h3>
+          <ul>
+            <li>角色：产品助理 · 合同 / 订单模块</li>
+            <li>方法：调研 → 建模 → 原型 / PRD → 协同落地</li>
+            <li>证明：下方可点开完整交互原型</li>
+          </ul>
+          <button class="btn btn-primary" type="button" data-open-demo="contract">打开合同订单原型 ↗</button>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="demos">
+      <div class="section-num">02 / DEMOS</div>
+      <h2 class="section-title">可验证产物<br><i>点开即看</i></h2>
+      <p class="section-desc">三个可交互入口。适合面试时边讲边演示，也适合 HR 先快速扫一眼。</p>
+      <div class="proof-grid with-phone">
+        <article class="proof-card dark">
+          <div>
+            <span class="idx">DEMO / 01</span>
+            <span class="chip">主案例配套</span>
+            <h3>合同订单<br>管理系统</h3>
+            <p>合同发起、审批、签署、台账与订单履约的完整后台原型。</p>
+          </div>
+          <button class="launch" type="button" data-open-demo="contract">体验原型 ↗</button>
+        </article>
+        <article class="proof-card">
+          <div>
+            <span class="idx">DEMO / 02</span>
+            <span class="chip">规则可验证</span>
+            <h3>ERP 采购<br>一体化平台</h3>
+            <p>规则配置 + 业务跑测：审批未完成、超预算、容差冲突等会被系统硬拦。</p>
+          </div>
+          <button class="launch" type="button" data-open-demo="erp">体验 ERP Demo ↗</button>
+        </article>
+        <article class="proof-card trip-phone">
+          <div class="trip-meta">
+            <span class="idx">DEMO / 03</span>
+            <span class="chip">国赛三等奖 · 手机原型</span>
+            <h3>AI 智能旅行助手</h3>
+            <p>Mate 手机样式直接展示；AI 问答与行程规划可点进全屏体验。</p>
+          </div>
+          <div class="phone-stage">
+            <div class="phone-frame">
+              <iframe src="trip-demo.html" title="AI 旅行助手手机预览" loading="lazy" tabindex="-1"></iframe>
+              <button class="phone-hit" type="button" data-open-demo="trip"><span>全屏体验 ↗</span></button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section timeline" id="experience">
+      <div class="section-num">03 / JOURNEY</div>
+      <h2 class="section-title">经历摘要<br><i>细节见简历</i></h2>
+      <div class="timeline-list">
+        <div class="time-item">
+          <time>2026.06 — 08</time>
+          <h3>北京北矿智能科技有限公司 · 产品助理</h3>
+          <p>参与工业互联网供应链采购平台；负责合同与订单模块流程、状态机、原型与 PRD，跟进评审到验收。</p>
+        </div>
+        <div class="time-item">
+          <time>2023.09 — 至今</time>
+          <h3>大连东软信息学院 · 计算机科学与技术</h3>
+          <p>计算机专业背景；熟悉前后端与数据库基础；职业方向聚焦 B 端产品。</p>
+        </div>
+        <div class="time-item">
+          <time>AWARDS</time>
+          <h3>竞赛与荣誉</h3>
+          <p>传智杯 HarmonyOS Codelabs 全国总决赛三等奖；蓝桥杯 Java 软件开发省赛三等奖。</p>
+        </div>
+      </div>
+
+      <div class="resume-panel" id="resume">
+        <div>
+          <small>FULL RESUME</small>
+          <h3>简历可浏览 · 可下载 · 可返回</h3>
+          <p>在线预览完整 PDF；需要时下载；关闭即可回到作品集当前位置。</p>
+        </div>
+        <div class="resume-panel-actions">
+          <button class="resume-open" type="button" data-open-resume>在线浏览</button>
+          <a class="resume-dl" href="李厚泽的简历.pdf" download="李厚泽的简历.pdf" data-download-resume>直接下载</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="contact" id="contact">
+    <div class="eyebrow">Open to opportunities</div>
+    <h2>方便的话<br>开聊<span>一下</span></h2>
+    <div class="contact-row">
+      <div class="contact-block">
+        <small>EMAIL</small>
+        <a href="mailto:lihouze349@gmail.com">lihouze349@gmail.com</a>
+        <button class="copy-btn" type="button" data-copy="lihouze349@gmail.com">复制</button>
+      </div>
+      <div class="contact-block">
+        <small>PHONE</small>
+        <a href="tel:13109976038">131 0997 6038</a>
+        <button class="copy-btn" type="button" data-copy="13109976038">复制</button>
+      </div>
+      <div class="contact-block">
+        <small>TARGET ROLE</small>
+        <span>产品经理 / B 端产品</span>
+      </div>
+      <div class="contact-block">
+        <small>RESUME</small>
+        <a href="#resume" data-open-resume>浏览 / 下载简历 ↗</a>
+      </div>
+    </div>
+    <div class="footer-note">
+      <span>© 2026 LI HOUZE</span>
+      <span>UPLOAD-READY STATIC PORTFOLIO</span>
+    </div>
+  </footer>
+
+  <div class="viewer" id="demoModal" role="dialog" aria-modal="true" aria-label="原型演示">
+    <div class="viewer-bar">
+      <strong id="demoTitle">原型演示</strong>
+      <div class="viewer-actions">
+        <a class="viewer-action" id="demoNewTab" href="#" target="_blank" rel="noopener">新窗口打开</a>
+        <button class="viewer-action" type="button" id="demoBack">返回作品集</button>
+        <button class="viewer-close" type="button" id="demoClose" aria-label="关闭">×</button>
+      </div>
+    </div>
+    <div class="viewer-stage" id="demoStage">
+      <iframe class="viewer-frame" id="demoFrame" title="产品原型"></iframe>
+    </div>
+  </div>
+
+  <div class="viewer" id="resumeModal" role="dialog" aria-modal="true" aria-label="简历预览">
+    <div class="viewer-bar">
+      <strong>李厚泽 · 产品经理简历</strong>
+      <div class="viewer-actions">
+        <span class="viewer-status" id="resumeStatus">可浏览</span>
+        <a class="viewer-action primary" id="resumeDownloadBtn" href="李厚泽的简历.pdf" download="李厚泽的简历.pdf">下载 PDF</a>
+        <a class="viewer-action" href="李厚泽的简历.pdf" target="_blank" rel="noopener">新窗口打开</a>
+        <button class="viewer-action" type="button" id="resumeBackBtn">返回作品集</button>
+        <button class="viewer-close" type="button" id="resumeClose" aria-label="关闭">×</button>
+      </div>
+    </div>
+    <iframe class="viewer-frame" id="resumeFrame" title="简历 PDF 预览"></iframe>
+    <div class="viewer-fallback" id="resumeFallback">
+      <p>当前环境无法内嵌预览 PDF。你可以下载，或新窗口打开后再返回本页。</p>
+      <div class="viewer-actions">
+        <a class="viewer-action primary" href="李厚泽的简历.pdf" download="李厚泽的简历.pdf">下载 PDF</a>
+        <a class="viewer-action" href="李厚泽的简历.pdf" target="_blank" rel="noopener">新窗口打开</a>
+        <button class="viewer-action" type="button" data-close-resume>返回作品集</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">已复制</div>
+
+  <script>
+    const demos = {
+      contract: { title: "合同订单管理系统 · 交互原型", file: "contract-demo.html" },
+      erp: { title: "供应链采购一体化平台 · ERP Demo", file: "erp-demo.html" },
+      trip: { title: "石光漫游 · AI 智能旅行助手", file: "trip-demo.html" }
+    };
+
+    const demoModal = document.getElementById("demoModal");
+    const demoFrame = document.getElementById("demoFrame");
+    const demoTitle = document.getElementById("demoTitle");
+    const demoNewTab = document.getElementById("demoNewTab");
+    let demoScrollY = 0;
+
+    function showToast(msg){
+      const t = document.getElementById("toast");
+      if(!t) return;
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 1800);
+    }
+
+    function openDemo(type){
+      const key = demos[type] ? type : "contract";
+      const meta = demos[key];
+      demoScrollY = window.scrollY || 0;
+      demoTitle.textContent = meta.title;
+      demoFrame.src = meta.file;
+      demoNewTab.href = meta.file;
+      demoModal.classList.toggle("phone-mode", key === "trip");
+      demoModal.classList.add("show");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeDemo(){
+      if(!demoModal.classList.contains("show")) return;
+      demoModal.classList.remove("show");
+      demoModal.classList.remove("phone-mode");
+      demoFrame.src = "about:blank";
+      document.body.classList.remove("modal-open");
+      window.scrollTo(0, demoScrollY);
+    }
+
+    document.querySelectorAll("[data-open-demo]").forEach(btn => {
+      btn.addEventListener("click", () => openDemo(btn.getAttribute("data-open-demo") || "contract"));
+    });
+    document.getElementById("demoClose").addEventListener("click", closeDemo);
+    document.getElementById("demoBack").addEventListener("click", closeDemo);
+
+    /* Resume: browse / download / return */
+    const RESUME_URL = "李厚泽的简历.pdf";
+    const resumeModal = document.getElementById("resumeModal");
+    const resumeFrame = document.getElementById("resumeFrame");
+    const resumeFallback = document.getElementById("resumeFallback");
+    const resumeStatus = document.getElementById("resumeStatus");
+    let resumeScrollY = 0;
+
+    function setResumeStatus(label){
+      if(resumeStatus) resumeStatus.textContent = label;
+    }
+
+    function openResume(e){
+      if(e) e.preventDefault();
+      resumeScrollY = window.scrollY || 0;
+      resumeModal.classList.add("show");
+      document.body.classList.add("modal-open");
+      setResumeStatus("可浏览");
+      resumeFallback.classList.remove("show");
+      resumeFrame.style.display = "block";
+      resumeFrame.src = RESUME_URL + "#toolbar=1&navpanes=0&view=FitH";
+    }
+
+    function closeResume(){
+      if(!resumeModal.classList.contains("show")) return;
+      resumeModal.classList.remove("show");
+      document.body.classList.remove("modal-open");
+      setResumeStatus("已返回");
+      showToast("已返回作品集");
+      window.scrollTo(0, resumeScrollY);
+      setTimeout(() => setResumeStatus("可浏览"), 800);
+    }
+
+    function downloadResume(){
+      setResumeStatus("可下载");
+      showToast("开始下载简历");
+    }
+
+    document.querySelectorAll("[data-open-resume]").forEach(el => el.addEventListener("click", openResume));
+    document.querySelectorAll("[data-close-resume]").forEach(el => el.addEventListener("click", closeResume));
+    document.querySelectorAll("[data-download-resume]").forEach(el => el.addEventListener("click", downloadResume));
+    document.getElementById("resumeClose").addEventListener("click", closeResume);
+    document.getElementById("resumeBackBtn").addEventListener("click", closeResume);
+    document.getElementById("resumeDownloadBtn").addEventListener("click", downloadResume);
+
+    document.addEventListener("keydown", e => {
+      if(e.key !== "Escape") return;
+      if(resumeModal.classList.contains("show")){ closeResume(); return; }
+      if(demoModal.classList.contains("show")) closeDemo();
+    });
+
+    document.querySelectorAll("[data-copy]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const value = btn.getAttribute("data-copy");
+        try { await navigator.clipboard.writeText(value); }
+        catch(_){
+          const ta = document.createElement("textarea");
+          ta.value = value; document.body.appendChild(ta); ta.select();
+          document.execCommand("copy"); ta.remove();
+        }
+        showToast("已复制：" + value);
+      });
+    });
+
+    const menuBtn = document.getElementById("menuBtn");
+    const topnav = document.getElementById("topnav");
+    menuBtn.addEventListener("click", () => {
+      const open = topnav.classList.toggle("open");
+      menuBtn.textContent = open ? "×" : "☰";
+      menuBtn.setAttribute("aria-expanded", String(open));
+    });
+    topnav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+      topnav.classList.remove("open");
+      menuBtn.textContent = "☰";
+      menuBtn.setAttribute("aria-expanded", "false");
+    }));
+  </script>
+</body>
+</html>

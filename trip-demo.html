@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>石光漫游 · Mate 60 演示</title>
+<style>
+:root{
+  --p:#007AFF;--pd:#0057D9;--pw:#EAF2FF;--ac:#FF9500;--bg:#F2F4F7;--sf:#fff;
+  --t:#111827;--s:#6B7280;--mu:#9CA3AF;--b:#E5E7EB;--danger:#FF3B30;--ok:#34C759;
+  --r:18px;--btn-r:14px;--ov:rgba(15,23,42,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:"HarmonyOS Sans","PingFang SC","Microsoft YaHei",sans-serif;background:#0a0a0a;color:var(--t);touch-action:manipulation;user-select:none}
+button,input{font:inherit;border:0;background:0;color:inherit}button{cursor:pointer}input{user-select:text}
+
+/* —— Mate 60 机身：打孔屏 + 窄边框 + 约 19.8:9 —— */
+.stage{height:100%;width:100%;display:flex;align-items:center;justify-content:center;padding:16px;background:
+  radial-gradient(ellipse at 30% 0%,rgba(0,122,255,.16),transparent 50%),#0a0a0a}
+.mate{
+  /* Mate 60 逻辑分辨率近似 390×844 @1x 展示 */
+  width:min(390px,100%);
+  height:min(844px,100%);
+  aspect-ratio:390/844;
+  max-height:100%;
+  position:relative;
+  border-radius:48px;
+  padding:10px;
+  background:linear-gradient(160deg,#2a2d32 0%,#1a1c1f 40%,#0e0f11 100%);
+  box-shadow:
+    0 0 0 1px #3d424a,
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 30px 80px rgba(0,0,0,.55);
+}
+.mate-side{position:absolute;right:-2px;top:148px;width:3px;height:56px;background:#2a2d32;border-radius:2px 0 0 2px}
+.mate-side.vol{top:220px;height:90px;left:-2px;right:auto;border-radius:0 2px 2px 0}
+.screen{
+  width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;
+  background:var(--bg);display:flex;flex-direction:column;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);
+}
+/* 居中打孔摄像头 */
+.punch{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:60;
+  width:14px;height:14px;border-radius:50%;
+  background:#0a0a0a;box-shadow:0 0 0 2px #1a1a1a,inset 0 0 2px #333;
+  pointer-events:none;
+}
+.status{
+  flex:none;height:42px;padding:14px 22px 0;display:flex;align-items:flex-start;justify-content:space-between;
+  background:var(--sf);font-size:12px;font-weight:700;position:relative;z-index:2;
+}
+.status .mid{width:40px} /* 给打孔留空 */
+.status .sig{display:flex;gap:3px;align-items:center;font-size:10px;font-weight:600}
+.status .bat{width:22px;height:11px;border:1.5px solid #111;border-radius:3px;position:relative;display:inline-block;margin-left:4px}
+.status .bat:before{content:"";position:absolute;right:-3px;top:2px;width:2px;height:5px;background:#111;border-radius:1px}
+.status .bat i{display:block;height:100%;width:72%;background:#111;border-radius:1px}
+
+/* 嵌入作品集机框时：去掉外层 Mate 壳，由外层机框承担 */
+html.in-frame body{background:var(--bg)}
+html.in-frame .stage{padding:0;background:var(--bg)}
+html.in-frame .mate{width:100%;height:100%;max-height:none;aspect-ratio:auto;border-radius:0;padding:0;box-shadow:none;background:transparent}
+html.in-frame .mate-side{display:none}
+html.in-frame .screen{border-radius:0;box-shadow:none}
+html.in-frame .punch{top:8px;width:12px;height:12px}
+
+.topbar{flex:none;height:56px;padding:0 12px;background:var(--sf);display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(17,24,39,.06)}
+.menu-btn{color:var(--p);font-size:15px;font-weight:500;padding:8px 4px}
+.menu-btn:active{opacity:.6}
+.title-block{flex:1;min-width:0;text-align:left;padding:4px 6px;border-radius:10px}
+.title-block:active{background:var(--pw)}
+.title-block b{display:block;font-size:18px;font-weight:700;line-height:1.2}
+.title-block span{display:block;font-size:12px;color:var(--mu);margin-top:2px}
+.pill{height:28px;padding:0 10px;border-radius:18px;background:var(--pw);color:var(--p);font-size:12px;font-weight:600;display:inline-flex;align-items:center}
+.pill:active{opacity:.75}
+.ai-btn{width:36px;height:36px;border-radius:18px;background:var(--pw);color:var(--p);font-size:13px;font-weight:700;display:grid;place-items:center}
+.ai-btn:active{transform:scale(.94)}
+.me-btn{color:var(--p);font-size:13px;font-weight:500;padding:8px 4px}
+
+.tabs{flex:none;height:44px;background:var(--sf);display:flex;border-bottom:1px solid rgba(17,24,39,.06)}
+.tab{flex:1;font-size:14px;color:var(--mu);position:relative;font-weight:500}
+.tab.on{color:var(--p);font-weight:700}
+.tab.on:after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:22px;height:3px;background:var(--p);border-radius:2px}
+.tab:active{opacity:.7}
+
+.body{flex:1;min-height:0;position:relative;overflow:hidden;background:linear-gradient(175deg,#f7f9fc 0%,var(--bg) 48%,#eef2f7 100%)}
+.scroll{position:absolute;inset:0;overflow:auto;padding:16px 16px 110px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.home-ind{position:absolute;left:0;right:0;bottom:6px;height:4px;display:flex;justify-content:center;pointer-events:none;z-index:5}
+.home-ind i{width:108px;height:4px;border-radius:4px;background:rgba(17,24,39,.2)}
+
+.sec{margin-bottom:18px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sec-h b{font-size:13px;color:var(--s);font-weight:600}
+.sec-h .link{font-size:13px;color:var(--p);font-weight:500}
+.sec-h .muted{font-size:12px;color:var(--mu)}
+
+.stepper{display:flex;align-items:flex-start;justify-content:space-between;padding:4px 8px 0;position:relative}
+.stepper:before{content:"";position:absolute;left:18%;right:18%;top:17px;height:2px;background:#dbe3ef;z-index:0}
+.step{flex:1;text-align:center;position:relative;z-index:1}
+.step i{display:grid;place-items:center;width:28px;height:28px;margin:0 auto 6px;border-radius:50%;background:#e8eef6;color:var(--s);font-style:normal;font-size:12px;font-weight:700}
+.step.on i,.step.done i{background:var(--p);color:#fff}
+.step span{font-size:12px;color:var(--s)}
+.step.on span,.step.done span{color:var(--t);font-weight:600}
+
+.pref-row{background:var(--sf);border-radius:var(--r);padding:14px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 18px rgba(15,23,42,.04)}
+.pref-row:active{transform:scale(.99)}
+.pref-row .txt{flex:1;min-width:0}
+.pref-row .txt strong{display:block;font-size:14px;margin-bottom:4px}
+.pref-row .txt span{font-size:12px;color:var(--mu);line-height:1.4}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:32px;padding:0 12px;border-radius:16px;background:var(--sf);border:1px solid var(--b);color:var(--s);font-size:12px;display:inline-flex;align-items:center}
+.chip.on{background:var(--p);border-color:var(--p);color:#fff;font-weight:700}
+.chip:active{transform:scale(.96)}
+
+.card{background:var(--sf);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:0 6px 18px rgba(15,23,42,.05)}
+.card-pad{padding:14px}
+.empty{text-align:center;padding:36px 20px}
+.empty h3{font-size:17px;margin-bottom:8px}
+.empty p{font-size:13px;color:var(--s);line-height:1.6;margin-bottom:18px}
+.btn{height:48px;border-radius:var(--btn-r);font-size:15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 16px}
+.btn-p{background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;box-shadow:0 8px 18px rgba(0,122,255,.28)}
+.btn-p:active{transform:scale(.98)}
+.btn-g{background:var(--sf);border:1px solid var(--b);color:var(--t)}
+.btn:disabled{opacity:.55}
+
+.bottom-bar{position:absolute;left:0;right:0;bottom:18px;padding:0 16px;display:none;gap:10px;z-index:6}
+.bottom-bar.show{display:flex}
+.bottom-bar .btn{flex:1}
+
+.food-img,.hotel-img{height:150px;background:linear-gradient(135deg,#bfdbfe,#60a5fa 50%,#007AFF);display:grid;place-items:center;font-size:46px;color:#fff}
+.food-body,.hotel-body{padding:12px 14px 14px}
+.row-between{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.name{font-size:17px;font-weight:700}
+.price{font-size:16px;font-weight:700;color:var(--p)}
+.price.lg{font-size:20px}
+.desc{font-size:13px;color:var(--s);line-height:1.5;margin:8px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{font-size:12px;color:var(--mu);display:flex;justify-content:space-between;align-items:center}
+.meta .go{color:var(--p);font-size:14px;font-weight:500}
+.fav-pill{height:28px;min-width:64px;padding:0 10px;border-radius:14px;background:var(--pw);color:var(--p);font-size:12px;font-weight:600}
+.fav-pill.on{background:#fff1f0;color:var(--danger)}
+.tag-line{font-size:12px;color:var(--s);margin:6px 0 10px}
+.book-btn{height:40px;width:88px;border-radius:12px;background:var(--p);color:#fff;font-size:13px;font-weight:700}
+.book-btn:active{opacity:.85}
+.h-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.h-scroll::-webkit-scrollbar{display:none}
+
+.search-card{background:var(--sf);border-radius:var(--r);padding:12px;margin-bottom:12px;box-shadow:0 4px 14px rgba(15,23,42,.04)}
+.search-inp{height:40px;border-radius:12px;background:var(--bg);padding:0 12px;display:flex;align-items:center;gap:8px;color:var(--mu);font-size:13px;margin-bottom:10px}
+.date-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.date-cell{background:var(--bg);border-radius:12px;padding:10px 12px;text-align:left}
+.date-cell span{display:block;font-size:11px;color:var(--mu);margin-bottom:4px}
+.date-cell b{font-size:13px;font-weight:600}
+.date-cell:active{background:#e8eef6}
+
+.circle-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.circle-top span{font-size:13px;color:var(--s)}
+.publish{height:34px;padding:0 14px;border-radius:17px;background:var(--p);color:#fff;font-size:13px;font-weight:700}
+.post-h{display:flex;gap:10px;align-items:flex-start;padding:14px 14px 0}
+.av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#60a5fa,var(--p));color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.post-meta{flex:1;min-width:0}
+.post-meta .u{font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px}
+.lv{font-size:10px;background:#fff7ed;color:var(--ac);padding:2px 6px;border-radius:8px;font-weight:700}
+.post-meta .sub{font-size:11px;color:var(--mu);margin-top:3px}
+.follow{height:28px;padding:0 10px;border-radius:14px;background:var(--pw);color:var(--p);font-size:12px;font-weight:600;flex:none}
+.post-title{padding:10px 14px 0;font-size:17px;font-weight:700}
+.post-body{padding:6px 14px 0;font-size:15px;line-height:1.55;color:var(--t);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.post-topics{padding:8px 14px;font-size:13px;color:var(--p);font-weight:600}
+.post-acts{display:flex;border-top:1px solid var(--b);margin-top:4px}
+.post-acts button{flex:1;height:42px;font-size:13px;color:var(--s);font-weight:600}
+.post-acts button:active{background:var(--bg)}
+.post-acts button.on{color:var(--p)}
+
+/* 遮罩 / Sheet / AI / 侧栏 */
+.mask{position:absolute;inset:0;background:var(--ov);z-index:30;display:none;align-items:flex-end;justify-content:center}
+.mask.show{display:flex}
+.sheet{width:100%;max-height:78%;background:var(--sf);border-radius:24px 24px 0 0;padding:10px 16px 24px;overflow:auto;transform:translateY(20px);animation:up .28s ease forwards}
+@keyframes up{to{transform:none}}
+.handle{width:36px;height:4px;border-radius:4px;background:#d1d5db;margin:0 auto 12px}
+.sheet h3{font-size:17px;margin-bottom:6px}
+.sheet .tip{font-size:12px;color:var(--s);margin-bottom:12px;line-height:1.5}
+.sheet-row{display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--b);font-size:14px}
+.sheet-row .st{font-size:12px;color:var(--p)}
+.sheet-actions{display:flex;gap:10px;margin-top:16px}
+.sheet-actions .btn{flex:1}
+
+.ai-mask{position:absolute;inset:0;background:var(--ov);z-index:40;display:none;align-items:center;justify-content:center;padding:24px 16px}
+.ai-mask.show{display:flex}
+.ai-card{width:92%;height:78%;max-height:640px;background:var(--sf);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden}
+.ai-top{height:52px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b)}
+.ai-top b{font-size:18px}
+.ai-top .x{color:var(--p);font-size:14px;font-weight:600;padding:8px}
+.ai-body{flex:1;overflow:auto;padding:14px;-webkit-overflow-scrolling:touch}
+.ai-empty{text-align:center;padding:28px 12px 8px}
+.ai-empty h4{font-size:18px;margin-bottom:8px}
+.ai-empty p{font-size:12px;color:var(--s);line-height:1.65;margin-bottom:16px}
+.quick{display:flex;flex-direction:column;gap:8px}
+.quick button{min-height:40px;border-radius:12px;background:var(--pw);color:var(--p);font-size:13px;font-weight:600;padding:8px 12px;text-align:left}
+.bubble{max-width:76%;padding:10px 12px;border-radius:16px;font-size:13px;line-height:1.55;margin-bottom:10px;white-space:pre-wrap;user-select:text}
+.bubble.user{margin-left:auto;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;border-bottom-right-radius:6px}
+.bubble.ai-wrap{max-width:86%}
+.bubble.ai{background:var(--bg);border-bottom-left-radius:6px;margin-bottom:4px}
+.ai-ops{display:flex;gap:10px;margin:0 0 10px 4px}
+.ai-ops button{font-size:11px;color:var(--p);font-weight:600}
+.ai-foot{padding:10px 12px 14px;border-top:1px solid var(--b);display:flex;gap:8px}
+.ai-foot input{flex:1;height:48px;border-radius:24px;background:var(--bg);padding:0 16px;font-size:14px;outline:0}
+.ai-foot .send{width:68px;height:48px;border-radius:24px;background:var(--p);color:#fff;font-size:14px;font-weight:700}
+
+.side{position:absolute;inset:0;z-index:35;visibility:hidden;pointer-events:none}
+.side.show{visibility:visible;pointer-events:auto}
+.side-m{position:absolute;inset:0;background:rgba(15,23,42,0);transition:background .22s;backdrop-filter:blur(0)}
+.side.show .side-m{background:rgba(15,23,42,.4);backdrop-filter:blur(6px)}
+.side-p{position:absolute;left:0;top:0;bottom:0;width:82%;max-width:300px;background:rgba(255,255,255,.92);backdrop-filter:blur(26px);padding:48px 14px 20px;transform:translateX(-105%);transition:transform .26s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+.side.show .side-p{transform:none}
+.side-close{color:var(--p);font-size:14px;margin-bottom:18px;text-align:left}
+.side-brand{font-size:22px;font-weight:800;margin-bottom:2px}
+.side-sub{font-size:12px;color:var(--s);margin-bottom:20px}
+.grp{font-size:11px;color:var(--mu);letter-spacing:.08em;margin:10px 6px 6px}
+.side-item{width:100%;min-height:52px;border-radius:12px;padding:8px 12px;display:flex;flex-direction:column;justify-content:center;text-align:left;margin-bottom:4px}
+.side-item:active,.side-item.on{background:var(--pw)}
+.side-item strong{font-size:14px}
+.side-item em{font-style:normal;font-size:11px;color:var(--mu);margin-top:2px}
+.side-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--b);font-size:11px;color:var(--mu);line-height:1.6}
+
+.gen-mask{position:absolute;inset:0;z-index:45;background:rgba(242,244,247,.82);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.gen-mask.show{display:flex}
+.skel{width:70%;height:12px;border-radius:8px;background:linear-gradient(90deg,#e5e7eb,#f3f4f6,#e5e7eb);background-size:200% 100%;animation:sh 1s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.gen-mask p{font-size:14px;color:var(--s);font-weight:600}
+
+.toast{position:absolute;left:50%;bottom:100px;transform:translateX(-50%) translateY(10px);background:rgba(17,24,39,.92);color:#fff;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:600;opacity:0;transition:.22s;z-index:70;max-width:86%;text-align:center;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+.tl{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--b);font-size:13px}
+.tl time{color:var(--p);font-weight:700}
+.dialog{width:86%;background:var(--sf);border-radius:18px;padding:20px 18px 14px;box-shadow:0 16px 40px rgba(0,0,0,.2)}
+.dialog h3{font-size:17px;margin-bottom:10px;text-align:center}
+.dialog p{font-size:13px;color:var(--s);line-height:1.7;text-align:center;white-space:pre-line;margin-bottom:16px}
+.dialog .acts{display:flex;gap:8px}
+.dialog .acts .btn{flex:1;height:44px;font-size:14px}
+
+/* 仅顶层真机窄屏去壳；作品集 iframe 内始终保留 Mate 手机样式 */
+html.native-mobile .stage{padding:0}
+html.native-mobile .mate{width:100%;height:100%;aspect-ratio:auto;border-radius:0;padding:0;box-shadow:none;background:#000}
+html.native-mobile .screen{border-radius:0}
+html.native-mobile .mate-side{display:none}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="mate">
+    <i class="mate-side"></i><i class="mate-side vol"></i>
+    <div class="screen" id="app">
+      <div class="punch" aria-hidden="true"></div>
+      <div class="status">
+        <span id="clock">09:41</span>
+        <span class="mid"></span>
+        <span class="sig">5G <span class="bat"><i></i></span></span>
+      </div>
+
+      <header class="topbar">
+        <button class="menu-btn" id="btnMenu" type="button">菜单</button>
+        <button class="title-block" id="btnLoc" type="button">
+          <b id="topTab">首页</b>
+          <span id="topCity">大连</span>
+        </button>
+        <button class="pill" id="btnTheme" type="button">浅色</button>
+        <button class="ai-btn" id="btnAi" type="button">AI</button>
+        <button class="me-btn" id="btnMe" type="button">我的</button>
+      </header>
+      <nav class="tabs" id="tabs"></nav>
+
+      <div class="body">
+        <div class="scroll" id="main"></div>
+        <div class="bottom-bar" id="bottomBar">
+          <button class="btn btn-p" id="btnPlan" type="button">规划表</button>
+          <button class="btn btn-p" id="btnGen" type="button">生成行程</button>
+        </div>
+        <div class="home-ind"><i></i></div>
+      </div>
+
+      <div class="gen-mask" id="genMask"><div class="skel"></div><div class="skel" style="width:55%"></div><p>正在生成行程草案…</p></div>
+
+      <div class="mask" id="sheetMask"><div class="sheet" id="sheet"></div></div>
+      <div class="ai-mask" id="aiMask">
+        <div class="ai-card">
+          <div class="ai-top"><b>AI 问答</b><button class="x" id="aiClose" type="button">关闭</button></div>
+          <div class="ai-body" id="aiBody"></div>
+          <div class="ai-foot">
+            <input id="aiInput" placeholder="问问 AI，帮你规划旅程" maxlength="120" enterkeyhint="send">
+            <button class="send" id="aiSend" type="button">发送</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="side" id="side">
+        <div class="side-m" id="sideMask"></div>
+        <aside class="side-p">
+          <button class="side-close" id="sideClose" type="button">← 关闭</button>
+          <div class="side-brand">石光漫游</div>
+          <div class="side-sub">行程草稿 · 对话归档</div>
+          <div class="grp">会话</div>
+          <button class="side-item on" type="button"><strong>新对话</strong><em>当前标签页</em></button>
+          <button class="side-item" type="button" data-side="hist"><strong>历史记录</strong><em>按标签页保存</em></button>
+          <button class="side-item" type="button" data-side="fav"><strong>我的收藏</strong><em id="favCount">0</em></button>
+          <button class="side-item" type="button" data-side="order"><strong>我的订单</strong><em id="orderCount">0</em></button>
+          <button class="side-item" type="button" data-side="theme"><strong>外观主题</strong><em id="themeHint">当前：浅色</em></button>
+          <div class="grp">说明</div>
+          <p style="font-size:11px;color:var(--mu);line-height:1.65;padding:0 8px">对话与行程列表保存在本机。切换顶部标签会切换对应草稿区；定位城市可在顶部地址进入地图页修改。</p>
+          <div class="side-foot">石光漫游 客户端<br>内部版本 1.0.0</div>
+        </aside>
+      </div>
+
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  (function(){
+    const params = new URLSearchParams(location.search);
+    const inIframe = window.self !== window.top;
+    // 仅显式 embed=1 时去壳（外层自带机框）；默认 iframe / 桌面都保留手机样式
+    if(params.get('embed') === '1') document.documentElement.classList.add('in-frame');
+    else if(!inIframe && window.matchMedia('(max-width:430px)').matches){
+      document.documentElement.classList.add('native-mobile');
+    }
+  })();
+
+  const TABS=['首页','美食推荐','订酒店','圈子'];
+  const PREFS=['亲子','慢节奏','经济型','含老人','自驾','避拥挤'];
+  const FOOD_FILTERS=['全部','海鲜','小吃','夜市'];
+  const HOTEL_CHIPS=['全部条件','近地铁','可取消','含早餐','高评分','亲子房','商务优选'];
+  const CITIES=['大连','成都','西安','厦门','杭州','北京','上海'];
+  const PLANS={
+    '大连':[
+      {t:'09:00',a:'星海广场漫步，拍摄百年城雕与海边风光'},
+      {t:'10:30',a:'参观自然博物馆或圣亚海洋世界（按季节二选一）'},
+      {t:'12:00',a:'青泥洼桥附近午餐：焖子、海鲜水饺等本地小吃'},
+      {t:'14:00',a:'中山广场与俄罗斯风情街散步拍照'},
+      {t:'16:00',a:'东港音乐喷泉广场，沿海步道看港湾'},
+      {t:'18:30',a:'海鲜烧烤或海胆水饺晚餐，夜市逛一逛'},
+      {t:'20:30',a:'返回酒店休息，整理明日行程'}
+    ],
+    '成都':[
+      {t:'09:00',a:'宽窄巷子慢逛'},{t:'12:00',a:'春熙路午餐'},{t:'15:00',a:'大熊猫基地'},{t:'19:00',a:'火锅晚餐'}
+    ],
+    '西安':[
+      {t:'08:30',a:'兵马俑'},{t:'12:30',a:'回民街'},{t:'15:00',a:'古城墙骑行'},{t:'18:30',a:'大唐不夜城'}
+    ]
+  };
+  const FOODS=[
+    {name:'海胆水饺',price:'¥48/份',area:'中山广场',desc:'鲜甜海胆入馅，口感饱满。',cat:'海鲜',emoji:'🥟'},
+    {name:'焖子',price:'¥18/份',area:'青泥洼桥',desc:'外焦里糯，蒜汁一浇香气扑鼻。',cat:'小吃',emoji:'🍲'},
+    {name:'铁板鱿鱼',price:'¥22/串',area:'星海广场',desc:'焦香微辣，适合边逛边吃。',cat:'夜市',emoji:'🦑'},
+    {name:'海鲜烧烤拼盘',price:'¥96/份',area:'东港',desc:'扇贝、虾和鱿鱼组合，适合两三人分享。',cat:'海鲜',emoji:'🦐'}
+  ];
+  const HOTELS=[
+    {name:'海景国际酒店',score:'4.8分 卓越',price:'¥528 起',tag:'海景房·亲子优选',area:'星海广场',filters:['含早餐','高评分','亲子房'],emoji:'🏨'},
+    {name:'城市轻奢精品酒店',score:'4.7分 很好',price:'¥368 起',tag:'地铁旁·商务优选',area:'青泥洼桥',filters:['近地铁','可取消','含早餐','商务优选'],emoji:'🏙️'},
+    {name:'旧街巷青年旅舍',score:'4.6分 很好',price:'¥128 起',tag:'背包客·多人间',area:'老城区',filters:['可取消'],emoji:'🎒'},
+    {name:'东港艺术度假酒店',score:'4.9分 惊喜',price:'¥698 起',tag:'海港夜景·设计感',area:'东港',filters:['含早餐','高评分','可取消'],emoji:'🌊'}
+  ];
+  const POSTS=[
+    {user:'阿泽',av:'泽',lv:5,title:'大连两天一夜轻松路线',text:'星海 → 东港 → 夜市海鲜，节奏刚好不赶。适合第一次来大连的朋友照着走。',like:386,comment:42,time:'2小时前'},
+    {user:'海风旅人',av:'海',lv:3,title:'海胆水饺避坑指南',text:'中山广场这家值得排队。别周末中午去，队伍会很长。',like:215,comment:28,time:'昨天'},
+    {user:'石光同学',av:'光',lv:4,title:'AI 规划真的省时间',text:'用 AI 生成行程后再微调，比自己从零拼攻略快太多了。',like:512,comment:67,time:'3天前'}
+  ];
+
+  const state={
+    tab:'首页', city:'大连', prefs:['慢节奏'],
+    foodFilter:'全部', hotelFilter:'全部条件',
+    hotelQuery:'', checkIn:'选择入住', checkOut:'选择离店',
+    trip:null, generating:false, dark:false,
+    favs:new Set(), likes:new Set(), follows:new Set(),
+    orders:[], aiReady:false
+  };
+
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1700)}
+  function tick(){const d=new Date();$('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+  tick(); setInterval(tick,20000);
+
+  function prefSummary(){
+    if(!state.prefs.length) return '点击选择旅行偏好';
+    if(state.prefs.length<=3) return state.prefs.join('、');
+    return state.prefs.slice(0,3).join('、')+`… 等${state.prefs.length}项`;
+  }
+  function stepState(){
+    if(state.trip) return [2,2,2];
+    if(state.generating) return [2,1,0];
+    return [1,0,0];
+  }
+
+  function renderTabs(){
+    $('tabs').innerHTML=TABS.map(t=>`<button class="tab${state.tab===t?' on':''}" data-tab="${t}" type="button">${t}</button>`).join('');
+    $('topTab').textContent=state.tab;
+    $('topCity').textContent=state.city;
+    $('bottomBar').classList.toggle('show', state.tab==='首页');
+  }
+
+  function renderHome(){
+    const st=stepState();
+    const labels=['选址','草案','微调'];
+    let tripBlock='';
+    if(state.trip){
+      tripBlock=`<div class="card card-pad">
+        <div class="row-between"><strong style="font-size:16px">${esc(state.city)}精选一日游</strong><span class="muted">${state.trip.length} 个行程节点</span></div>
+        <p class="meta" style="margin:6px 0 10px">${esc(state.city)} · 今日</p>
+        <div class="chips" style="margin-bottom:12px">${state.prefs.map(p=>`<span class="chip on" style="pointer-events:none">${esc(p)}</span>`).join('')}</div>
+        <button class="btn btn-p" style="width:100%;height:44px;margin-bottom:8px" data-open-plan type="button">进入规划</button>
+        <div class="sec-h"><b style="color:var(--t)">行程安排</b></div>
+        ${state.trip.map(x=>`<div class="tl"><time>${esc(x.t)}</time><div>${esc(x.a)}</div></div>`).join('')}
+      </div>`;
+    }else{
+      tripBlock=`<div class="card"><div class="empty">
+        <h3>还没有行程</h3>
+        <p>选择目的地与偏好，生成你的下一次旅行计划</p>
+        <button class="btn btn-p" id="btnGenInline" type="button">立即生成行程</button>
+      </div></div>`;
+    }
+    $('main').innerHTML=`
+      <div class="sec">
+        <div class="sec-h"><b>规划进度</b></div>
+        <div class="stepper">${labels.map((l,i)=>`<div class="step ${st[i]===2?'done':st[i]===1?'on':''}"><i>${i+1}</i><span>${l}</span></div>`).join('')}</div>
+      </div>
+      <div class="sec">
+        <div class="sec-h"><b>旅行偏好</b><button class="link" data-open-pref type="button">选择 ▾</button></div>
+        <button class="pref-row" data-open-pref type="button">
+          <div class="txt"><strong>旅行偏好</strong><span>${esc(prefSummary())}</span></div>
+          <span style="color:var(--p)">›</span>
+        </button>
+      </div>
+      <div class="sec">
+        <div class="sec-h"><b>我的行程</b><span class="muted">${state.trip?'1 条':'暂无'}</span></div>
+        ${tripBlock}
+      </div>`;
+  }
+
+  function renderFood(){
+    const list=FOODS.filter(f=>state.foodFilter==='全部'||f.cat===state.foodFilter);
+    $('main').innerHTML=`
+      <div class="sec-h"><b style="color:var(--t);font-size:15px">附近推荐</b><span class="muted">${esc(state.foodFilter)}</span></div>
+      <div class="h-scroll" style="margin-bottom:12px">${FOOD_FILTERS.map(f=>`<button class="chip${state.foodFilter===f?' on':''}" data-ff="${f}" type="button">${f}</button>`).join('')}</div>
+      ${list.map((f,i)=>`<article class="card">
+        <div class="food-img">${f.emoji}</div>
+        <div class="food-body">
+          <div class="row-between"><div class="name">${esc(f.name)}</div><div class="price">${esc(f.price)}</div></div>
+          <div class="row-between" style="margin-top:8px">
+            <button class="fav-pill${state.favs.has('f:'+f.name)?' on':''}" data-fav="f:${esc(f.name)}" type="button">${state.favs.has('f:'+f.name)?'已收藏':'收藏'}</button>
+          </div>
+          <p class="desc">${esc(f.desc)}</p>
+          <div class="meta"><span>${esc(f.area)}</span><button class="go" data-food="${i}" type="button">查看详情</button></div>
+        </div>
+      </article>`).join('')}`;
+  }
+
+  function renderHotel(){
+    const list=HOTELS.filter(h=>{
+      if(state.hotelQuery && !h.name.includes(state.hotelQuery) && !h.area.includes(state.hotelQuery)) return false;
+      if(state.hotelFilter==='全部条件') return true;
+      return h.filters.includes(state.hotelFilter);
+    });
+    $('main').innerHTML=`
+      <div class="search-card">
+        <div class="search-inp">搜索　<input id="hotelSearch" value="${esc(state.hotelQuery)}" placeholder="搜索酒店名称、位置..." style="flex:1;background:0;outline:0;font-size:13px;color:var(--t)"></div>
+        <div class="date-grid">
+          <button class="date-cell" data-date="in" type="button"><span>入住</span><b>${esc(state.checkIn)}</b></button>
+          <button class="date-cell" data-date="out" type="button"><span>离店</span><b>${esc(state.checkOut)}</b></button>
+        </div>
+      </div>
+      <div class="sec-h"><b>常见筛选</b><button class="link" data-open-hfilter type="button">筛选 ▾</button></div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:12px">${esc(state.hotelFilter)}</p>
+      ${list.length?list.map((h,i)=>`<article class="card">
+        <div class="hotel-img">${h.emoji}</div>
+        <div class="hotel-body">
+          <div class="row-between">
+            <div class="name" style="font-size:17px;font-weight:600">${esc(h.name)}</div>
+            <button class="fav-pill${state.favs.has('h:'+h.name)?' on':''}" data-fav="h:${esc(h.name)}" type="button">${state.favs.has('h:'+h.name)?'已收藏':'收藏'}</button>
+          </div>
+          <p class="muted" style="margin-top:6px;font-size:13px">${esc(h.score)} · ${esc(h.area)}</p>
+          <p class="tag-line">${esc(h.tag)}</p>
+          <div class="row-between" style="align-items:center">
+            <div class="price lg">${esc(h.price)}</div>
+            <button class="book-btn" data-book="${HOTELS.indexOf(h)}" type="button">去预订</button>
+          </div>
+        </div>
+      </article>`).join(''):`<div class="card"><div class="empty"><h3>暂无符合筛选的酒店</h3><p>试试切换其他筛选条件</p><button class="btn btn-p" data-clear-hf type="button">清除筛选</button></div></div>`}`;
+    const inp=$('hotelSearch');
+    if(inp){inp.addEventListener('input',()=>{state.hotelQuery=inp.value.trim();});inp.addEventListener('change',()=>render());}
+  }
+
+  function renderCircle(){
+    $('main').innerHTML=`
+      <div class="circle-top"><span>${esc(state.city)} · 热门旅动态</span><button class="publish" id="btnPublish" type="button">发布</button></div>
+      ${POSTS.length?POSTS.map((p,i)=>`<article class="card">
+        <div class="post-h">
+          <div class="av">${esc(p.av)}</div>
+          <div class="post-meta">
+            <div class="u">${esc(p.user)} <span class="lv">Lv.${p.lv}</span></div>
+            <div class="sub">${esc(state.city)} · ${esc(p.time)} · 来自石光漫游</div>
+          </div>
+          <button class="follow" data-follow="${i}" type="button">${state.follows.has(i)?'已关注':'+ 关注'}</button>
+        </div>
+        <div class="post-title">${esc(p.title)}</div>
+        <div class="post-body">${esc(p.text)}</div>
+        <div class="post-topics">#城市旅行　#旅行日常</div>
+        <div class="post-acts">
+          <button data-share="${i}" type="button">转发</button>
+          <button type="button">评论 ${p.comment}</button>
+          <button data-like="${i}" class="${state.likes.has(i)?'on':''}" type="button">赞 ${p.like+(state.likes.has(i)?1:0)}</button>
+        </div>
+      </article>`).join(''):`<div class="card"><div class="empty"><h3>暂无帖子</h3><p>成为第一个在${esc(state.city)}发帖的人吧</p><button class="btn btn-p" id="btnPublish2" type="button">发布</button></div></div>`}`;
+  }
+
+  function render(){
+    renderTabs();
+    if(state.tab==='首页') renderHome();
+    else if(state.tab==='美食推荐') renderFood();
+    else if(state.tab==='订酒店') renderHotel();
+    else renderCircle();
+    $('favCount').textContent=String(state.favs.size);
+    $('orderCount').textContent=String(state.orders.length);
+    $('main').scrollTop=0;
+  }
+
+  function openSheet(html){
+    $('sheet').innerHTML=`<div class="handle"></div>${html}`;
+    $('sheetMask').classList.add('show');
+  }
+  function closeSheet(){ $('sheetMask').classList.remove('show'); }
+
+  function openPrefSheet(){
+    openSheet(`<h3>旅行偏好</h3><p class="tip">可多选，用于生成更贴合的行程草案</p>
+      ${PREFS.map(p=>`<button class="sheet-row" data-toggle-pref="${p}" type="button"><span>${p}</span><span class="st">${state.prefs.includes(p)?'已选':'选择'}</span></button>`).join('')}
+      <div class="sheet-actions">
+        <button class="btn btn-g" data-clear-pref type="button">清空</button>
+        <button class="btn btn-p" id="sheetDone" type="button">完成</button>
+      </div>`);
+  }
+
+  function openCitySheet(){
+    openSheet(`<h3>选择目的地</h3><p class="tip">对应 App 中的定位 / 城市选择页</p>
+      <div class="chips">${CITIES.map(c=>`<button class="chip${state.city===c?' on':''}" data-city="${c}" type="button">${c}</button>`).join('')}</div>
+      <div class="sheet-actions"><button class="btn btn-p" id="sheetDone" type="button" style="flex:1">完成</button></div>`);
+  }
+
+  function openHotelFilter(){
+    openSheet(`<h3>常见筛选</h3><p class="tip">单选条件，快速缩小酒店范围</p>
+      ${HOTEL_CHIPS.map(c=>`<button class="sheet-row" data-hf="${c}" type="button"><span>${c}</span><span class="st">${state.hotelFilter===c?'当前':''}</span></button>`).join('')}
+      <div class="sheet-actions"><button class="btn btn-p" id="sheetDone" type="button" style="flex:1">完成</button></div>`);
+  }
+
+  function openPlanSheet(){
+    if(!state.trip){ toast('请先生成行程'); return; }
+    openSheet(`<div class="row-between" style="align-items:center;margin-bottom:8px"><h3 style="margin:0">规划表</h3><div><button data-copy-plan type="button" style="color:var(--p);font-size:13px;font-weight:600;margin-right:10px">复制</button><button id="sheetDone" type="button" style="font-size:16px">✕</button></div></div>
+      <p class="tip">行程名称：${esc(state.city)}精选一日游<br>行程日期：今日<br>行程地点：${esc(state.city)}</p>
+      <div class="tl" style="font-weight:700;color:var(--s)"><time>时间</time><div>活动内容</div></div>
+      ${state.trip.map(x=>`<div class="tl"><time>${esc(x.t)}</time><div>${esc(x.a)}</div></div>`).join('')}
+      <div class="sheet-actions">
+        <button class="btn btn-g" type="button" id="sheetDone">编辑行程</button>
+        <button class="btn btn-p" type="button" data-del-trip>删除行程</button>
+      </div>`);
+  }
+
+  function openFoodDetail(i){
+    const f=FOODS[i];
+    openSheet(`<div class="food-img" style="border-radius:16px;margin-bottom:12px">${f.emoji}</div>
+      <h3>${esc(f.name)}</h3>
+      <p class="tip">${esc(f.area)} · ${esc(f.price)}</p>
+      <p style="font-size:14px;line-height:1.7;margin-bottom:14px">${esc(f.desc)}</p>
+      <button class="btn btn-p" style="width:100%" data-fav-sheet="f:${esc(f.name)}" type="button">${state.favs.has('f:'+f.name)?'已收藏':'收藏'}</button>
+      <button class="btn btn-g" style="width:100%;margin-top:8px" id="sheetDone" type="button">关闭</button>`);
+  }
+
+  function confirmBook(idx){
+    if(state.checkIn==='选择入住'||state.checkOut==='选择离店'){ toast('请先选择入住和离店日期'); return; }
+    const h=HOTELS[idx];
+    $('sheetMask').classList.add('show');
+    $('sheet').innerHTML=`<div class="dialog" style="margin:auto">
+      <h3>确认预订</h3>
+      <p>${esc(h.name)}\n${esc(state.checkIn)} 至 ${esc(state.checkOut)}\n${esc(h.price)}</p>
+      <div class="acts">
+        <button class="btn btn-g" id="sheetDone" type="button">再看看</button>
+        <button class="btn btn-p" data-confirm-book="${idx}" type="button">确认预订</button>
+      </div>
+    </div>`;
+    $('sheetMask').style.alignItems='center';
+  }
+
+  function generateTrip(){
+    if(state.generating) return;
+    if(!state.city){ toast('请先选择可用目的地'); return; }
+    state.generating=true; render();
+    $('genMask').classList.add('show');
+    $('btnGen').disabled=true; $('btnGen').textContent='生成中…';
+    setTimeout(()=>{
+      let plan=(PLANS[state.city]||PLANS['大连']).map(x=>({...x}));
+      if(state.prefs.includes('亲子')) plan=plan.map(x=>({...x,a:x.a+'（亲子友好）'}));
+      if(state.prefs.includes('慢节奏')&&plan.length>5) plan=plan.slice(0,5);
+      if(state.prefs.includes('经济型')) plan.push({t:'提示',a:'已偏向免费/低消费景点与本地小吃'});
+      state.trip=plan; state.generating=false;
+      $('genMask').classList.remove('show');
+      $('btnGen').disabled=false; $('btnGen').textContent='生成行程';
+      render(); toast('已生成可编辑行程'); openPlanSheet();
+    },1200);
+  }
+
+  function openAi(){
+    $('aiMask').classList.add('show');
+    if(!state.aiReady){
+      $('aiBody').innerHTML=`<div class="ai-empty">
+        <h4>AI 旅行助手</h4>
+        <p>这是模拟问答窗口。输入酒店、美食或行程问题，会先给出本地模拟回复；真实接口可用时会自动使用在线回复。</p>
+        <div class="quick">
+          <button data-q="帮我推荐附近美食" type="button">帮我推荐附近美食</button>
+          <button data-q="今晚住哪里方便" type="button">今晚住哪里方便</button>
+          <button data-q="生成三日游路线" type="button">生成三日游路线</button>
+        </div>
+      </div>`;
+      state.aiReady=true;
+    }
+  }
+
+  function aiReply(text){
+    const box=$('aiBody');
+    const empty=box.querySelector('.ai-empty'); if(empty) empty.remove();
+    box.insertAdjacentHTML('beforeend',`<div class="bubble user">${esc(text)}</div><div class="bubble ai-wrap"><div class="bubble ai" id="typing">助手正在回复…</div></div>`);
+    box.scrollTop=box.scrollHeight;
+    setTimeout(()=>{
+      let ans='可以告诉我你的预算和同行人数，我再帮你细化。';
+      if(/美食|吃|水饺/.test(text)) ans='附近推荐：海胆水饺（中山广场）、焖子（青泥洼桥）、海鲜烧烤（东港）。人均大约 80–150 元。';
+      else if(/住|酒店/.test(text)) ans='看预算：海景亲子选海景国际酒店；商务地铁选城市轻奢精品酒店；穷游可选旧街巷青年旅舍。建议勾选「可取消」。';
+      else if(/三日|路线|行程|规划/.test(text)) ans='三日草案：D1 星海/东港海岸线；D2 旅顺口；D3 金石滩。需要我按「慢节奏」压缩景点吗？';
+      const tip=/行程|路线|规划|三日/.test(text)?`<div style="margin:0 0 12px;padding:10px;background:var(--pw);border-radius:12px;font-size:12px;color:var(--p)">识别到行程相关内容 <button data-open-plan-ai type="button" style="font-weight:700;color:var(--pd)">打开规划表</button></div>`:'';
+      const el=$('typing');
+      if(el) el.parentElement.outerHTML=`<div class="bubble ai-wrap"><div style="font-size:11px;color:var(--mu);margin:0 0 4px 4px">助手</div><div class="bubble ai">${esc(ans)}</div><div class="ai-ops"><button type="button">复制</button><button type="button">收藏</button><button type="button">全文</button></div>${tip}</div>`;
+      box.scrollTop=box.scrollHeight;
+    },700);
+  }
+
+  function toggleFav(key){
+    if(state.favs.has(key)){ state.favs.delete(key); toast('已取消收藏'); }
+    else { state.favs.add(key); toast('已收藏'); }
+    render();
+  }
+
+  /* events */
+  $('tabs').onclick=e=>{ const t=e.target.closest('[data-tab]'); if(t){ state.tab=t.dataset.tab; render(); } };
+  $('btnMenu').onclick=()=>$('side').classList.add('show');
+  $('sideMask').onclick=$('sideClose').onclick=()=>$('side').classList.remove('show');
+  $('btnLoc').onclick=openCitySheet;
+  $('btnAi').onclick=openAi;
+  $('aiClose').onclick=()=>$('aiMask').classList.remove('show');
+  $('btnTheme').onclick=()=>{
+    state.dark=!state.dark;
+    $('btnTheme').textContent=state.dark?'深色':'浅色';
+    $('themeHint').textContent='当前：'+(state.dark?'深色':'浅色');
+    toast(state.dark?'已切到深色':'已切到浅色');
+  };
+  $('btnMe').onclick=()=>toast('可到侧栏查看收藏与订单');
+  $('btnGen').onclick=generateTrip;
+  $('btnPlan').onclick=openPlanSheet;
+
+  $('main').onclick=e=>{
+    if(e.target.closest('[data-open-pref]')){ openPrefSheet(); return; }
+    if(e.target.closest('#btnGenInline')||e.target.closest('[data-open-plan]')){ if(e.target.closest('[data-open-plan]')) openPlanSheet(); else generateTrip(); return; }
+    const ff=e.target.closest('[data-ff]'); if(ff){ state.foodFilter=ff.dataset.ff; render(); return; }
+    const fav=e.target.closest('[data-fav]'); if(fav){ toggleFav(fav.dataset.fav); return; }
+    const food=e.target.closest('[data-food]'); if(food){ openFoodDetail(+food.dataset.food); return; }
+    if(e.target.closest('[data-open-hfilter]')){ openHotelFilter(); return; }
+    if(e.target.closest('[data-clear-hf]')){ state.hotelFilter='全部条件'; render(); return; }
+    const date=e.target.closest('[data-date]');
+    if(date){
+      if(date.dataset.date==='in'){ state.checkIn='3月28日'; state.checkOut=state.checkOut==='选择离店'?'3月30日':state.checkOut; }
+      else { state.checkOut='3月30日'; if(state.checkIn==='选择入住') state.checkIn='3月28日'; }
+      render(); toast('已选择日期'); return;
+    }
+    const book=e.target.closest('[data-book]'); if(book){ confirmBook(+book.dataset.book); return; }
+    const like=e.target.closest('[data-like]'); if(like){ const i=+like.dataset.like; state.likes.has(i)?state.likes.delete(i):state.likes.add(i); render(); return; }
+    const fo=e.target.closest('[data-follow]'); if(fo){ const i=+fo.dataset.follow; state.follows.has(i)?state.follows.delete(i):state.follows.add(i); render(); return; }
+    if(e.target.closest('[data-share]')||e.target.id==='btnPublish'||e.target.id==='btnPublish2'){ toast(e.target.id&&e.target.id.startsWith('btnPublish')?'发布入口已点亮':'已转发'); }
+  };
+
+  $('sheetMask').onclick=e=>{
+    if(e.target=== $('sheetMask')){ closeSheet(); $('sheetMask').style.alignItems=''; return; }
+    if(e.target.id==='sheetDone'){ closeSheet(); $('sheetMask').style.alignItems=''; render(); return; }
+    const tp=e.target.closest('[data-toggle-pref]');
+    if(tp){ const p=tp.dataset.togglePref; state.prefs=state.prefs.includes(p)?state.prefs.filter(x=>x!==p):[...state.prefs,p]; openPrefSheet(); return; }
+    if(e.target.closest('[data-clear-pref]')){ state.prefs=[]; openPrefSheet(); return; }
+    const city=e.target.closest('[data-city]'); if(city){ state.city=city.dataset.city; state.trip=null; openCitySheet(); return; }
+    const hf=e.target.closest('[data-hf]'); if(hf){ state.hotelFilter=hf.dataset.hf; openHotelFilter(); return; }
+    if(e.target.closest('[data-copy-plan]')){ toast('已复制规划表'); return; }
+    if(e.target.closest('[data-del-trip]')){ state.trip=null; closeSheet(); render(); toast('已删除行程'); return; }
+    const fs=e.target.closest('[data-fav-sheet]'); if(fs){ toggleFav(fs.dataset.favSheet); closeSheet(); return; }
+    const cb=e.target.closest('[data-confirm-book]');
+    if(cb){
+      const h=HOTELS[+cb.dataset.confirmBook];
+      state.orders.push({name:h.name,in:state.checkIn,out:state.checkOut,price:h.price});
+      closeSheet(); $('sheetMask').style.alignItems='';
+      toast('预订成功，可到「我的 → 订单」查看'); render();
+    }
+  };
+
+  $('aiSend').onclick=()=>{ const v=$('aiInput').value.trim(); if(!v) return; $('aiInput').value=''; aiReply(v); };
+  $('aiInput').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); $('aiSend').click(); } };
+  $('aiBody').onclick=e=>{
+    const q=e.target.closest('[data-q]'); if(q){ aiReply(q.dataset.q); return; }
+    if(e.target.closest('[data-open-plan-ai]')){ $('aiMask').classList.remove('show'); if(!state.trip) generateTrip(); else openPlanSheet(); }
+  };
+
+  $('side').onclick=e=>{
+    const item=e.target.closest('[data-side]'); if(!item) return;
+    $('side').classList.remove('show');
+    const k=item.dataset.side;
+    if(k==='theme'){ $('btnTheme').click(); return; }
+    if(k==='hist'){ toast('历史记录按标签页保存'); return; }
+    if(k==='fav'){
+      openSheet(`<h3>我的收藏</h3>${state.favs.size?`<p class="tip">${[...state.favs].map(x=>esc(x.slice(2))).join('、')}</p>`:'<p class="tip">还没有收藏<br>在美食或酒店卡片点收藏后，会实时出现在这里。</p>'}
+        <button class="btn btn-p" style="width:100%" id="sheetDone" type="button">关闭</button>`);
+    }
+    if(k==='order'){
+      openSheet(`<h3>我的订单</h3>${state.orders.length?state.orders.map(o=>`<div class="card card-pad" style="margin-top:8px"><strong>${esc(o.name)}</strong><p class="tip" style="margin:6px 0">${esc(o.in)} 至 ${esc(o.out)}</p><div class="price">${esc(o.price)}</div></div>`).join(''):'<p class="tip">还没有酒店订单<br>在酒店页选择日期后点击去预订，确认后会出现在这里。</p>'}
+        <button class="btn btn-p" style="width:100%;margin-top:12px" id="sheetDone" type="button">关闭</button>`);
+    }
+  };
+
+  /* 左右滑切换 Tab */
+  (function(){
+    const el=$('main'); let x0=0,y0=0,axis=null;
+    el.addEventListener('touchstart',e=>{ const t=e.changedTouches[0]; x0=t.clientX; y0=t.clientY; axis=null; },{passive:true});
+    el.addEventListener('touchmove',e=>{
+      const t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+      if(axis===null && (Math.abs(dx)>10||Math.abs(dy)>10)) axis=Math.abs(dx)>Math.abs(dy)?'x':'y';
+    },{passive:true});
+    el.addEventListener('touchend',e=>{
+      if(axis!=='x') return;
+      const dx=e.changedTouches[0].clientX-x0; const i=TABS.indexOf(state.tab);
+      if(dx<-56 && i<TABS.length-1){ state.tab=TABS[i+1]; render(); }
+      if(dx>56 && i>0){ state.tab=TABS[i-1]; render(); }
+    },{passive:true});
+  })();
+
+  render();
+})();
+</script>
+</body>
+</html>
